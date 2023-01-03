@@ -4,7 +4,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -14,8 +13,14 @@ import { Input, MenuItem, Select } from "@mui/material";
 import avatarImg from "./../../assets/user-avatar.jpg";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { storage } from "../../firebase";
+import LinearLoader from "../../component/loader/LinearLoader";
 
 const theme = createTheme();
 
@@ -23,17 +28,20 @@ const EditContact = (props) => {
   const [state, setState] = useState({});
   const [imageUpload, setImageUpload] = useState({});
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [loading, setLoding] = useState(false);
   const router = useRouter();
-  const quaryname  = router.query.name;
-
-  console.log('state', state);
+  const quaryname = router.query.name;
 
   useEffect(() => {
-    if(!quaryname) return;
+    if (!quaryname) return;
+    setLoding(true);
     const imageRef = ref(storage, `images/${quaryname}`);
-    getDownloadURL(imageRef).then((url) => {
-      setUploadedImageUrl(url);
-    });
+    getDownloadURL(imageRef)
+      .then((url) => {
+        setLoding(false);
+        setUploadedImageUrl(url);
+      })
+      .catch((error) => console.error(error));
     let prevContactList = localStorage.getItem("contactList")
       ? JSON.parse(localStorage.getItem("contactList"))
       : [];
@@ -43,8 +51,6 @@ const EditContact = (props) => {
   }, []);
 
   const changeHandeler = (e) => {
-    console.log(e.target.name, e.target.value, e.target.checked)
-    // return
     var inpkey = e.target.name;
     var value = e.target.value;
     if (inpkey === "isWhatsapp") {
@@ -57,11 +63,10 @@ const EditContact = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (state.contactNumber?.length < 1) return;
-    // if (imageUpload == null || imageUpload == "") {
-    //   alert("Select image to upload.");
-    //   return;
-    // }
+    if (state.contactNumber?.length !== 10) {
+      alert("Contact number should be 10 digits number.");
+      return;
+    }
 
     uploadImage(quaryname);
     let prevContactList = localStorage.getItem("contactList")
@@ -72,11 +77,7 @@ const EditContact = (props) => {
       (el) => el.name === quaryname
     );
     prevContactList.splice(foundDataIndex, 1, state);
-    localStorage.setItem(
-      "contactList",
-      JSON.stringify([...prevContactList])
-    );
-
+    localStorage.setItem("contactList", JSON.stringify([...prevContactList]));
 
     localStorage.setItem(
       "contactList",
@@ -85,34 +86,33 @@ const EditContact = (props) => {
   };
 
   let uploadImage = (quaryname) => {
-    if(!imageUpload && state.name === quaryname) return;
+    if (!imageUpload && state.name === quaryname) return;
 
-
-    if(state.name !== quaryname || imageUpload){
-        const delimageRef = ref(storage, `images/${quaryname}`);
-        deleteObject(delimageRef).then(() => {
-            // File deleted successfully
-            console.log('img del')
-          }).catch((error) => {
-            // Uh-oh, an error occurred!
-            console.error(error)
+    if (state.name !== quaryname || imageUpload) {
+      const delimageRef = ref(storage, `images/${quaryname}`);
+      deleteObject(delimageRef)
+        .then(() => {
+          // File deleted successfully
+          console.log("img del");
+        })
+        .catch((error) => {
+          // Uh-oh, an error occurred!
+          console.error(error);
         });
 
-        const imageRef = ref(storage, `images/${state.name}`);
-        uploadBytes(imageRef, imageUpload)
+      const imageRef = ref(storage, `images/${state.name}`);
+      uploadBytes(imageRef, imageUpload)
         .then(() => {
           getDownloadURL(imageRef)
             .then((url) => {
               setUploadedImageUrl(url);
               alert("Image uploaded successfully");
-              router.push('/')
+              router.push("/");
             })
             .catch((error) => console.error(error));
         })
         .catch((error) => console.error(error));
     }
-
-   
   };
 
   return (
@@ -128,6 +128,10 @@ const EditContact = (props) => {
             alignItems: "center",
           }}
         >
+          {
+            loading && 
+          <LinearLoader />
+          }
           <Typography
             component="h1"
             variant="h5"
@@ -158,16 +162,7 @@ const EditContact = (props) => {
               alt="user image"
             />
           </label>
-          {/* <Input */}
-          // type='file' // accept="image/png, image/jpeg" // hidden //
-          id='uploadIn=mg'
-          {/* // value={imageUpload} '// */}
-          // onChange={(e) => setImageUpload(e.target.files[0])}
-          {/* //   /> */}
-          {/* <Avatar  src={avatarImg} alt="user image" sx={{ m: 1, bgcolor: 'secondary.main' }}> */}
-          {/* <LockOutlinedIcon /> */}
-          {/* <Image src={  avatar} alt="user image" /> */}
-          {/* </Avatar> */}
+
           <Box
             component="form"
             noValidate
@@ -181,10 +176,11 @@ const EditContact = (props) => {
                   name="name"
                   required
                   fullWidth
-                  id="firstName"
-                  label="First Name"
+                  id="name"
+                  label="Name"
                   autoFocus
                   value={state.name}
+                  disabled
                   onChange={changeHandeler}
                 />
               </Grid>
@@ -205,19 +201,13 @@ const EditContact = (props) => {
                 <Select
                   required
                   fullWidth
-                  displayEmpty
-                  labelId="Select contact type"
                   id="type"
-                  //   value={type}
                   label="Select"
                   name="type"
                   key={state?.type}
-                  value={state?.type}
                   defaultValue={state?.type}
                   onChange={changeHandeler}
-                    // onChange={handleChange}
                 >
-                    <MenuItem value="">{state.type}</MenuItem>
                   <MenuItem value={"personal"}>Personal</MenuItem>
                   <MenuItem value={"office"}>Office</MenuItem>
                 </Select>
@@ -226,16 +216,15 @@ const EditContact = (props) => {
                 <FormControlLabel
                   name="isWhatsapp"
                   sx={{ color: "black !important" }}
-                  control={<Checkbox 
-                    key={state?.isWhatsapp} 
-                    checked={state?.isWhatsapp} 
-                    // defaultChecked={state?.isWhatsapp} 
-                    // defaultValue={state.isWhatsapp} 
-                    // value={state?.isWhatsapp} 
-                    onClick={changeHandeler}
-                    color="primary" 
-                    />}
-                  label="Is whatsApp availabel for this number."
+                  control={
+                    <Checkbox
+                      key={state?.isWhatsapp}
+                      checked={state?.isWhatsapp}
+                      onClick={changeHandeler}
+                      color="primary"
+                    />
+                  }
+                  label="Is whatsApp availabel."
                 />
               </Grid>
             </Grid>
@@ -244,19 +233,12 @@ const EditContact = (props) => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
               Update contact
             </Button>
-            {/* <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid> */}
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 5 }} /> */}
       </Container>
     </ThemeProvider>
   );

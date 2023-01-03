@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
 import ContactCard from "../component/contactlist";
@@ -8,49 +7,54 @@ import { getDownloadURL, ref } from "firebase/storage";
 import { storage } from "../firebase";
 import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
+import LinearLoader from "../component/loader/LinearLoader";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   let [contactList, setContactList] = useState([]);
-  //  const [imageList, setImageList] = useState([]);
+  const [loding, setLoding] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    console.count('count')
-    console.log('ccccccccccc')
+    setLoding(true);
     let list =
       JSON.parse(localStorage.getItem("contactList"))?.length > 0
         ? JSON.parse(localStorage.getItem("contactList"))
         : [{}];
-    console.log("list", list.length, "contactList.length", contactList.length);
 
     if (list?.length < 1 || contactList.length === list.length) return;
 
     list.forEach((item) => {
       const imageRef = ref(storage, `images/${item?.name}`);
-      console.log("imageRef", imageRef);
-      getDownloadURL(imageRef).then((url) => {
-        console.log("item", item, 'url', url);
+      if (imageRef._location.path_.includes("images/undefined")) {
+        setContactList((prev) => [...prev, item]);
+      } else {
+        getDownloadURL(imageRef).then((url) => {
+          console.log("item", item, "url", url);
 
-        setContactList(prev => [...prev, { ...item, url }]);
-      });
+          setContactList((prev) => [...prev, { ...item, url }]);
+        });
+      }
     });
 
-    return() => {
-      setContactList([])
+    setLoding(false);
+
+    return () => {
+      setContactList([]);
     };
   }, []);
 
-  console.log("contactlist", contactList);
-
   let deleteContact = (data) => {
+    setLoding(true);
     if (window.confirm("Do you want to delete the contact detail?") == true) {
       let rem = contactList.filter((el) => el.name !== data);
       setContactList(rem);
       localStorage.setItem("contactList", JSON.stringify(rem));
+      setLoding(false);
     }
+    setLoding(false);
   };
 
   return (
@@ -62,12 +66,14 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        {loding && <LinearLoader />}
         <Button onClick={() => router.push("/add-contact")}>
           Add new contact
         </Button>
-        {/* <div className={styles.center}> */}
         {contactList.length ? (
-          contactList.map((el) => <ContactCard deleteContact={deleteContact} detail={el} />)
+          contactList.map((el) => (
+            <ContactCard deleteContact={deleteContact} detail={el} />
+          ))
         ) : (
           <Typography
             component="h1"
@@ -77,8 +83,6 @@ export default function Home() {
             No contact available.
           </Typography>
         )}
-
-        {/* </div> */}
       </main>
     </>
   );
