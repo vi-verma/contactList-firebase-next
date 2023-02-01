@@ -200,7 +200,7 @@ const EditContact = (props) => {
                 name='isWhatsapp'
                 sx={{color: 'black !important'}}
                   control={<Checkbox value="true" color="primary" />}
-                  label="Is whatsApp availabel for this number."
+                  label="Is whatsApp available for this number."
                 />
               </Grid>
             </Grid>

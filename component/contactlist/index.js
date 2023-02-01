@@ -43,7 +43,7 @@ const ContactCard = (props) => {
           </CardContent>
           <CardContent>
             <Typography sx={{ fontSize: 18 }} gutterBottom>
-              Name: {name || "name"}
+              Name: {name || "--"}
             </Typography>
             <Typography sx={{ fontSize: 14 }} component="div">
               Contact No. : {contactNumber || "--"}

@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { CircularProgress, Input, MenuItem, Select } from "@mui/material";
+import { CircularProgress, Input, InputLabel, MenuItem, Select } from "@mui/material";
 import avatarImg from "../../assets/user-avatar.jpg";
 import Image from "next/image";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -177,13 +177,14 @@ const AddContact = () => {
                 />
               </Grid>
               <Grid item xs={12}>
+              <InputLabel id="demo-simple-select-label">Select Type</InputLabel>
                 <Select
                   required
                   fullWidth
-                  labelId="Select contact type"
-                  id="type"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select-label"
                   //   value={type}
-                  label="Select"
+                  // label="Select"
                   name="type"
                   //   onChange={handleChange}
                 >
@@ -196,7 +197,7 @@ const AddContact = () => {
                   name="isWhatsapp"
                   sx={{ color: "black !important" }}
                   control={<Checkbox value="true" color="primary" />}
-                  label="Is whatsApp availabel for this number."
+                  label="Is whatsApp available for this number."
                 />
               </Grid>
             </Grid>

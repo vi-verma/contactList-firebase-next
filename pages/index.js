@@ -18,13 +18,15 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    setLoding(true);
+
     let list =
       JSON.parse(localStorage.getItem("contactList"))?.length > 0
         ? JSON.parse(localStorage.getItem("contactList"))
-        : [{}];
+        : [];
 
     if (list?.length < 1 || contactList.length === list.length) return;
+
+    setLoding(true);
 
     list.forEach((item) => {
       const imageRef = ref(storage, `images/${item?.name}`);
@@ -33,7 +35,6 @@ export default function Home() {
       } else {
         getDownloadURL(imageRef).then((url) => {
           console.log("item", item, "url", url);
-
           setContactList((prev) => [...prev, { ...item, url }]);
         });
       }
@@ -67,11 +68,12 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {loding && <LinearLoader />}
-        <Button onClick={() => router.push("/add-contact")}>
+        <Button variant="contained" onClick={() => router.push("/add-contact")}>
           Add new contact
         </Button>
-        {contactList.length ? (
-          contactList.map((el) => (
+        {
+        contactList.length>0 ? (
+          contactList.sort().map((el) => (
             <ContactCard deleteContact={deleteContact} detail={el} />
           ))
         ) : (
@@ -82,7 +84,8 @@ export default function Home() {
           >
             No contact available.
           </Typography>
-        )}
+        )
+        }
       </main>
     </>
   );

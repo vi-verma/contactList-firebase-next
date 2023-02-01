@@ -224,7 +224,7 @@ const EditContact = (props) => {
                       color="primary"
                     />
                   }
-                  label="Is whatsApp availabel."
+                  label="Is whatsApp available."
                 />
               </Grid>
             </Grid>
