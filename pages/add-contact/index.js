@@ -118,7 +118,7 @@ const AddContact = () => {
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            marginTop: 4,
             paddingTop: 4,
             display: "flex",
             flexDirection: "column",
@@ -220,9 +220,18 @@ const AddContact = () => {
             >
               Create contact
             </Button>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mb: 2 }}
+              onClick={() => route.push('/')}
+            >
+              Cancel
+            </Button>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 5 }} />
+        {/* <Copyright sx={{ mt: 5 }} /> */}
       </Container>
     </ThemeProvider>
   );

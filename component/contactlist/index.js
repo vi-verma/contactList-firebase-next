@@ -42,7 +42,7 @@ const ContactCard = (props) => {
             />
           </CardContent>
           <CardContent>
-            <Typography sx={{ fontSize: 18 }} gutterBottom>
+            <Typography sx={{ fontSize: 18 }} >
               Name: {name || "--"}
             </Typography>
             <Typography sx={{ fontSize: 14 }} component="div">
@@ -51,7 +51,7 @@ const ContactCard = (props) => {
             <Typography sx={{ fontSize: 14 }}>
               Contact type : {type || "--"}
             </Typography>
-            <Typography>
+            <Typography sx={{ fontSize: 14 }}>
               {isWhatsapp && "Message "}
               {isWhatsapp && (
                 <Image
