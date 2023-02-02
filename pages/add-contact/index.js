@@ -48,6 +48,7 @@ const AddContact = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     let prevContactList = localStorage.getItem("contactList")
       ? JSON.parse(localStorage.getItem("contactList"))
       : [];
@@ -220,7 +221,6 @@ const AddContact = () => {
               Create contact
             </Button>
             <Button
-              type="submit"
               fullWidth
               variant="contained"
               sx={{ mb: 2 }}
