@@ -52,10 +52,11 @@ const ContactCard = (props) => {
               Contact type : {type || "--"}
             </Typography>
             <Typography>
+              {isWhatsapp && "Message "}
               {isWhatsapp && (
                 <Image
                   src={whatsappImage}
-                  style={{ height: "25px", width: "25px" }}
+                  style={{ height: "12px", width: "12px" }}
                   alt="wa icon"
                 />
               )}

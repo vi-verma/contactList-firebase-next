@@ -58,8 +58,18 @@ const AddContact = () => {
     let type = data.get("type");
     let isWhatsapp = data.get("isWhatsapp");
 
+    if (!name.length) {
+      alert("Enter name");
+      return;
+    };
+
     if (contactNumber.length !== 10) {
       alert("Contacl number should be of 10 digits.");
+      return;
+    };
+    if (!type) {
+      alert("Select contact type.");
+      return;
     };
     if (imageUpload == null || imageUpload == "") {
       alert("Select image to upload.");

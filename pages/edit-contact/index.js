@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Input, MenuItem, Select } from "@mui/material";
+import { MenuItem, Select } from "@mui/material";
 import avatarImg from "./../../assets/user-avatar.jpg";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -26,7 +26,8 @@ const theme = createTheme();
 
 const EditContact = (props) => {
   const [state, setState] = useState({});
-  const [imageUpload, setImageUpload] = useState({});
+  const [contactNumber, setContactNumber] = useState('');
+  const [imageUpload, setImageUpload] = useState();
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [loading, setLoding] = useState(false);
   const router = useRouter();
@@ -48,6 +49,7 @@ const EditContact = (props) => {
 
     let foundData = prevContactList.filter((el) => el.name === quaryname);
     setState(foundData[0]);
+    setContactNumber(foundData[0]?.contactNumber)
   }, []);
 
   const changeHandeler = (e) => {
@@ -62,6 +64,7 @@ const EditContact = (props) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!imageUpload && state.name === quaryname && contactNumber === state.contactNumber ) return;
 
     if (state.contactNumber?.length !== 10) {
       alert("Contact number should be 10 digits number.");
@@ -69,6 +72,9 @@ const EditContact = (props) => {
     }
 
     uploadImage(quaryname);
+
+    if(state.contactNumber === contactNumber) return;
+
     let prevContactList = localStorage.getItem("contactList")
       ? JSON.parse(localStorage.getItem("contactList"))
       : [];
@@ -77,23 +83,30 @@ const EditContact = (props) => {
       (el) => el.name === quaryname
     );
     prevContactList.splice(foundDataIndex, 1, state);
-    localStorage.setItem("contactList", JSON.stringify([...prevContactList]));
+    // localStorage.setItem("contactList", JSON.stringify([...prevContactList]));
 
     localStorage.setItem(
       "contactList",
       JSON.stringify([...prevContactList, state])
     );
+    if(!imageUpload){
+      setTimeout(() =>{
+        router.push('/')
+      },2000)
+      
+    }
   };
 
   let uploadImage = (quaryname) => {
     if (!imageUpload && state.name === quaryname) return;
 
     if (state.name !== quaryname || imageUpload) {
+      setLoding(true);
       const delimageRef = ref(storage, `images/${quaryname}`);
       deleteObject(delimageRef)
         .then(() => {
           // File deleted successfully
-          console.log("img del");
+          console.log("image deleted successfully");
         })
         .catch((error) => {
           // Uh-oh, an error occurred!
@@ -117,11 +130,11 @@ const EditContact = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs" sx={{ background: "white" }}>
+      <Container component="main" maxWidth="xs" sx={{ background: "white", mb: 2 }}>
         <CssBaseline />
         <Box
           sx={{
-            marginTop: 8,
+            margin: 3,
             paddingTop: 4,
             display: "flex",
             flexDirection: "column",
@@ -236,6 +249,16 @@ const EditContact = (props) => {
               disabled={loading}
             >
               Update contact
+            </Button>
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              sx={{  mb: 2 }}
+              // disabled={loading}
+              onClick={()=> router.push('/')}
+            >
+              Cancel
             </Button>
           </Box>
         </Box>

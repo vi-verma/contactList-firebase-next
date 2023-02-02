@@ -68,7 +68,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         {loding && <LinearLoader />}
-        <Button variant="contained" onClick={() => router.push("/add-contact")}>
+        <Button sx={{marginBottom: '1rem'}} variant="contained" onClick={() => router.push("/add-contact")}>
           Add new contact
         </Button>
         {
