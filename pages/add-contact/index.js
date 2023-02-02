@@ -196,7 +196,6 @@ const AddContact = () => {
                   //   value={type}
                   // label="Select"
                   name="type"
-                  //   onChange={handleChange}
                 >
                   <MenuItem value={"personal"}>Personal</MenuItem>
                   <MenuItem value={"office"}>Office</MenuItem>
